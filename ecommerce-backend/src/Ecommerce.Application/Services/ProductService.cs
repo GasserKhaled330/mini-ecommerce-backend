@@ -2,14 +2,14 @@
 
 public class ProductService(IApplicationDbContext context) : IProductService
 {
-	public async Task<ProductDto?> GetByIdAsync(int id)
+	public async Task<Result<ProductDto>> GetByIdAsync(int id)
 	{
 		var product = await context.Products.FindAsync(id);
 
-		return product?.ToDto();
+		return product is null ? Result<ProductDto>.Failure("Product not found", ErrorType.NotFound) : Result<ProductDto>.Success(product.ToDto());
 	}
 
-	public async Task<PagedResponse<IReadOnlyList<ProductDto>>> GetAllAsync(
+	public async Task<Result<PagedResponse<IReadOnlyList<ProductDto>>>> GetAllAsync(
 			int pageNumber,
 			int pageSize
 	)
@@ -22,43 +22,44 @@ public class ProductService(IApplicationDbContext context) : IProductService
 				.Select(p => p.ToDto())
 				.ToListAsync();
 
-		return new PagedResponse<IReadOnlyList<ProductDto>>(
+		return Result<PagedResponse<IReadOnlyList<ProductDto>>>.Success(new PagedResponse<IReadOnlyList<ProductDto>>(
 				products,
 				pageNumber,
 				pageSize,
 				totalCount
-		);
+		));
 	}
 
-	public async Task<ProductDto> CreateAsync(CreateProductRequest createProductRequest)
+	public async Task<Result<ProductDto>> CreateAsync(CreateProductRequest createProductRequest)
 	{
 		var product = createProductRequest.ToEntity();
 		await context.Products.AddAsync(product);
 		await context.SaveChangesAsync();
-		return product.ToDto();
+		return Result<ProductDto>.Success(product.ToDto());
 	}
 
-	public async Task<ProductDto> UpdateAsync(int id, UpdateProductRequest dto)
+	public async Task<Result<ProductDto>> UpdateAsync(int id, UpdateProductRequest dto)
 	{
 		var existingProduct = await context.Products.FindAsync(id);
 		if (existingProduct is null)
 		{
-			throw new KeyNotFoundException($"Product with id {id} not found.");
+			return Result<ProductDto>.Failure($"Product with id {id} not found.", ErrorType.NotFound);
 		}
 		dto.UpdateEntity(existingProduct);
 		await context.SaveChangesAsync();
 
-		return existingProduct.ToDto();
+		return Result<ProductDto>.Success(existingProduct.ToDto());
 	}
 
-	public async Task DeleteAsync(int id)
+	public async Task<Result> DeleteAsync(int id)
 	{
 		var existingProduct = await context.Products.FindAsync(id);
 		if (existingProduct is null)
 		{
-			throw new KeyNotFoundException($"Product with id {id} not found.");
+			return Result.Failure($"Product with id {id} not found.", ErrorType.NotFound);
 		}
 		context.Products.Remove(existingProduct);
 		await context.SaveChangesAsync();
+		return Result.Success();
 	}
 }
