@@ -1,21 +1,14 @@
-﻿using Ecommerce.Application.Dtos;
-using Microsoft.AspNetCore.Mvc;
-using System.Net.Mime;
+﻿namespace Ecommerce.Api.Controllers;
 
-namespace Ecommerce.Api.Controllers;
-
-[ApiController]
-[Route("api/[controller]")]
-[Produces(MediaTypeNames.Application.Json)]
-public class ProductsController(IProductService productService) : ControllerBase
+public class ProductsController(IProductService productService) : BaseApiController
 {
 
 	/// <summary>
 	/// Retrieves a paginated list of products.
 	/// </summary>
 	[HttpGet]
-	[ProducesResponseType(typeof(PagedResponse<IReadOnlyList<ProductDto>>), StatusCodes.Status200OK)]
-	public async Task<ActionResult<PagedResponse<IReadOnlyList<ProductDto>>>> GetAll(
+	[ProducesResponseType(typeof(Result<PagedResponse<IReadOnlyList<ProductDto>>>), StatusCodes.Status200OK)]
+	public async Task<IActionResult> GetAll(
 			[FromQuery] int pageNumber = 1,
 			[FromQuery] int pageSize = 10)
 	{
@@ -24,52 +17,43 @@ public class ProductsController(IProductService productService) : ControllerBase
 		pageSize = pageSize < 1 ? 10 : pageSize;
 
 		var result = await productService.GetAllAsync(pageNumber, pageSize);
-		return Ok(result);
+		return HandleResult(result);
 	}
 
 	/// <summary>
 	/// Retrieves a specific product by its ID.
 	/// </summary>
 	[HttpGet("{id:int}")]
-	[ProducesResponseType(typeof(ProductDto), StatusCodes.Status200OK)]
+	[ProducesResponseType(typeof(Result<ProductDto>), StatusCodes.Status200OK)]
 	[ProducesResponseType(StatusCodes.Status404NotFound)]
-	public async Task<ActionResult<ProductDto>> GetById(int id)
+	public async Task<IActionResult> GetById(int id)
 	{
 		var product = await productService.GetByIdAsync(id);
-
-		return product == null ? (ActionResult<ProductDto>)NotFound(new { Message = $"Product with ID {id} was not found." }) : (ActionResult<ProductDto>)Ok(product);
+		return HandleResult(product);
 	}
 
 	/// <summary>
 	/// Creates a new product.
 	/// </summary>
 	[HttpPost]
-	[ProducesResponseType(typeof(ProductDto), StatusCodes.Status201Created)]
+	[ProducesResponseType(typeof(Result<ProductDto>), StatusCodes.Status201Created)]
 	[ProducesResponseType(StatusCodes.Status400BadRequest)]
-	public async Task<ActionResult<ProductDto>> Create([FromBody] CreateProductRequest request)
+	public async Task<IActionResult> Create([FromBody] CreateProductRequest request)
 	{
 		var createdProduct = await productService.CreateAsync(request);
-
-		return CreatedAtAction(nameof(GetById), new { id = createdProduct.Id }, createdProduct);
+		return HandleCreated(createdProduct, nameof(GetById), new { id = createdProduct.Value?.Id });
 	}
 
 	/// <summary>
 	/// Updates an existing product.
 	/// </summary>
 	[HttpPut("{id:int}")]
-	[ProducesResponseType(typeof(ProductDto), StatusCodes.Status200OK)]
+	[ProducesResponseType(typeof(Result<ProductDto>), StatusCodes.Status200OK)]
 	[ProducesResponseType(StatusCodes.Status404NotFound)]
-	public async Task<ActionResult<ProductDto>> Update(int id, [FromBody] UpdateProductRequest request)
+	public async Task<IActionResult> Update(int id, [FromBody] UpdateProductRequest request)
 	{
-		try
-		{
-			var updatedProduct = await productService.UpdateAsync(id, request);
-			return Ok(updatedProduct);
-		}
-		catch (KeyNotFoundException ex)
-		{
-			return NotFound(new { ex.Message });
-		}
+		var updatedProduct = await productService.UpdateAsync(id, request);
+		return HandleResult(updatedProduct);
 	}
 
 	/// <summary>
@@ -80,14 +64,7 @@ public class ProductsController(IProductService productService) : ControllerBase
 	[ProducesResponseType(StatusCodes.Status404NotFound)]
 	public async Task<IActionResult> Delete(int id)
 	{
-		try
-		{
-			await productService.DeleteAsync(id);
-			return NoContent(); // Standard 204 response for successful deletion
-		}
-		catch (KeyNotFoundException ex)
-		{
-			return NotFound(new { ex.Message });
-		}
+		var result = await productService.DeleteAsync(id);
+		return HandleResult(result);
 	}
 }

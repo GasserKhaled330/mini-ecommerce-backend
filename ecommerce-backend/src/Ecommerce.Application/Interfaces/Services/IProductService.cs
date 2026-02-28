@@ -2,9 +2,9 @@
 
 public interface IProductService
 {
-	Task<ProductDto?> GetByIdAsync(int id);
-	Task<PagedResponse<IReadOnlyList<ProductDto>>> GetAllAsync(int pageNumber, int pageSize);
-	Task<ProductDto> CreateAsync(CreateProductRequest createProductRequest);
-	Task<ProductDto> UpdateAsync(int id, UpdateProductRequest updateProductRequest);
-	Task DeleteAsync(int id);
+	Task<Result<ProductDto>> GetByIdAsync(int id);
+	Task<Result<PagedResponse<IReadOnlyList<ProductDto>>>> GetAllAsync(int pageNumber, int pageSize);
+	Task<Result<ProductDto>> CreateAsync(CreateProductRequest createProductRequest);
+	Task<Result<ProductDto>> UpdateAsync(int id, UpdateProductRequest updateProductRequest);
+	Task<Result> DeleteAsync(int id);
 }

@@ -1,12 +1,17 @@
 ﻿global using Ecommerce.Api.ExceptionHandlers;
 global using Ecommerce.Api.Startup;
+global using Ecommerce.Application.Common;
+global using Ecommerce.Application.Dtos;
 global using Ecommerce.Application.Interfaces;
 global using Ecommerce.Application.Interfaces.Services;
 global using Ecommerce.Application.Services;
 global using Ecommerce.Application.Validators;
+global using Ecommerce.Core.Enums;
 global using Ecommerce.Infrastrcuture.Data;
 global using Ecommerce.Infrastructure.Data;
 global using Ecommerce.Infrastructure.Data.Seeders;
 global using FluentValidation;
+global using Microsoft.AspNetCore.Mvc;
 global using Microsoft.EntityFrameworkCore;
 global using SharpGrip.FluentValidation.AutoValidation.Mvc.Extensions;
+global using System.Net.Mime;

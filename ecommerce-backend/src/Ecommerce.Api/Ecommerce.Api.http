@@ -1,5 +1,5 @@
 @Ecommerce.Api_HostAddress = http://localhost:5010
-@ProductId = 12
+@ProductId = 15
 
 ### US-01: Create a New Product
 # Validates price > 0 and stock >= 0
@@ -44,6 +44,6 @@ Content-Type: application/json
   "name": "Broken Item",
   "description": "Invalid Price",
   "price": -10.00,
-  "quantity": 5
+  "quantity": -1
 }
 
