@@ -9,11 +9,15 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+builder.Services.AddSeeders();
+builder.Services.AddAppServices();
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
+	await DbInitializer.InitalizeAsync(app.Services);
 	app.UseSwagger();
 	app.UseSwaggerUI();
 }
