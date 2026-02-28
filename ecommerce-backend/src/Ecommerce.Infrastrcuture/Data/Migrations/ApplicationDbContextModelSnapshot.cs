@@ -46,8 +46,10 @@ namespace Ecommerce.Infrastructure.Data.Migrations
                         .HasColumnType("int");
 
                     b.Property<byte[]>("TimeStamp")
+                        .IsConcurrencyToken()
                         .IsRequired()
-                        .HasColumnType("varbinary(max)");
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("rowversion");
 
                     b.HasKey("Id");
 

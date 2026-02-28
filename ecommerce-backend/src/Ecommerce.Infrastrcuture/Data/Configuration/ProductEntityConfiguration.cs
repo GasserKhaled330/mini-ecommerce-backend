@@ -17,5 +17,7 @@ public class ProductEntityConfiguration : IEntityTypeConfiguration<Product>
 			.HasColumnType("decimal(8,2)");
 		builder.Property(p => p.Quantity)
 			.IsRequired();
+		builder.Property(p => p.TimeStamp)
+			.IsRowVersion();
 	}
 }
