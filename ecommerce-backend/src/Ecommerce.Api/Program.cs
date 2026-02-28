@@ -12,10 +12,14 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddSeeders();
 builder.Services.AddAppServices();
 builder.Services.AddValidators();
+builder.Services.AddProblemDetails();
+builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
 
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
+app.UseExceptionHandler();
+
 if (app.Environment.IsDevelopment())
 {
 	await DbInitializer.InitalizeAsync(app.Services);
