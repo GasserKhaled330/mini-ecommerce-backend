@@ -11,6 +11,7 @@ builder.Services.AddSwaggerGen();
 
 builder.Services.AddSeeders();
 builder.Services.AddAppServices();
+builder.Services.AddValidators();
 
 var app = builder.Build();
 
