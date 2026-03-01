@@ -1,5 +1,6 @@
 @Ecommerce.Api_HostAddress = http://localhost:5010
-@ProductId = 15
+@ProductId = 3
+@OrderId = 1
 
 ### US-01: Create a New Product
 # Validates price > 0 and stock >= 0
@@ -47,3 +48,66 @@ Content-Type: application/json
   "quantity": -1
 }
 
+### 1. Create a Valid Order (Happy Path)
+# This should:
+# - Subtract quantity from Product
+# - Apply 5% discount if 2-4 items, 10% if 5+ (US-04)
+# - Return 201 Created (US-03)
+POST {{Ecommerce.Api_HostAddress}}/api/orders
+Content-Type: application/json
+
+{
+  "customerName": "Jane Doe",
+  "items": [
+     
+      "productId": {{ProductId}},
+      "quantity": 3
+    }
+  ]
+}
+
+### 2. Get Order by ID (US-05)
+# This should return the full receipt including DiscountAmount and TotalAmount
+GET {{Ecommerce.Api_HostAddress}}/api/orders/{{OrderId}}
+Accept: application/json
+
+### 3. Create Order - Insufficient Stock (Conflict)
+# Tests US-03: Try to buy 999 items
+# Should return 409 Conflict via your Result Pattern
+POST {{Ecommerce.Api_HostAddress}}/api/orders
+Content-Type: application/json
+
+{
+  "customerName": "Bad Buyer",
+  "items": [
+    {
+      "productId": {{ProductId}},
+      "quantity": 999
+    }
+  ]
+}
+
+### 4. Create Order - Product Not Found
+# Should return 404 Not Found
+POST {{Ecommerce.Api_HostAddress}}/api/orders
+Content-Type: application/json
+
+{
+  "customerName": "Ghost Buyer",
+  "items": [
+    {
+      "productId": 9999,
+      "quantity": 1
+    }
+  ]
+}
+
+### 5. Create Order - Validation Error (FluentValidation)
+# Should return 400 Bad Request with your flattened Error string
+POST {{Ecommerce.Api_HostAddress}}/api/orders
+Content-Type: application/json
+
+{
+  "customerName": "",
+  "items": []
+}
