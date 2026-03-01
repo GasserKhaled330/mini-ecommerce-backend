@@ -1,5 +1,6 @@
 var builder = WebApplication.CreateBuilder(args);
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+const string MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
 
 // Add services to the container.
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
@@ -12,25 +13,15 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-builder.Services.Configure<ApiBehaviorOptions>(options =>
+builder.Services.AddCors(options =>
 {
-	options.InvalidModelStateResponseFactory = context =>
-	{
-		var errorMessages = context
-					.ModelState.Values.SelectMany(v => v.Errors)
-					.Select(e => e.ErrorMessage)
-					.ToList();
-		var errorMessage = string.Join(" | ", errorMessages);
-
-		var problemDetails = new ProblemDetails
-		{
-			Status = StatusCodes.Status400BadRequest,
-			Title = "Validation Error",
-			Detail = errorMessage,
-			Instance = context.HttpContext.Request.Path,
-		};
-		return new BadRequestObjectResult(problemDetails);
-	};
+	options.AddPolicy(name: MyAllowSpecificOrigins,
+			policy =>
+			{
+				policy.WithOrigins("http://localhost:5173")
+								.AllowAnyHeader()
+								.AllowAnyMethod();
+			});
 });
 
 builder.Services.AddProblemDetails();
@@ -53,6 +44,8 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+app.UseCors(MyAllowSpecificOrigins);
 
 app.UseAuthorization();
 
