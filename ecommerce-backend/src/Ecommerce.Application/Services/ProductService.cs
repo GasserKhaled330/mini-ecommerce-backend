@@ -20,6 +20,7 @@ public class ProductService(IApplicationDbContext context) : IProductService
 
 		var products = await context
 				.Products.AsNoTracking()
+				.OrderByDescending(p => p.Id)
 				.Skip((pageNumber - 1) * pageSize)
 				.Take(pageSize)
 				.Select(p => p.ToDto())
@@ -61,6 +62,13 @@ public class ProductService(IApplicationDbContext context) : IProductService
 		{
 			return Result.Failure($"Product with id {id} not found.", ErrorType.NotFound);
 		}
+
+		var hasOrders = await context.OrderItems.AnyAsync(x => x.ProductId == id);
+		if (hasOrders)
+		{
+			return Result<bool>.Failure("This product cannot be deleted because it is part of an existing order.", ErrorType.Conflict);
+		}
+
 		context.Products.Remove(existingProduct);
 		await context.SaveChangesAsync();
 		return Result.Success();
