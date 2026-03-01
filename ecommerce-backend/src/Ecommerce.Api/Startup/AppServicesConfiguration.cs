@@ -6,5 +6,6 @@ public static class AppServicesConfiguration
 	{
 		services.AddScoped<IApplicationDbContext>(sp => sp.GetRequiredService<ApplicationDbContext>());
 		services.AddScoped<IProductService, ProductService>();
+		services.AddScoped<IOrderService, OrderService>();
 	}
 }
