@@ -1,7 +1,7 @@
 ﻿namespace Ecommerce.Api.Controllers;
 
 [ApiController]
-[Route("api/[controller]")]
+[Route("api/v{version:apiVersion}/[controller]")]
 [Produces(MediaTypeNames.Application.Json)]
 public abstract class BaseApiController : ControllerBase
 {

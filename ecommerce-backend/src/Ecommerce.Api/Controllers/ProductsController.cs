@@ -1,5 +1,6 @@
 ﻿namespace Ecommerce.Api.Controllers;
 
+[ApiVersion("1.0")]
 public class ProductsController(IProductService productService) : BaseApiController
 {
 

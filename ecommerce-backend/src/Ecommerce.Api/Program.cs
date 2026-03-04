@@ -11,7 +11,10 @@ builder.Services.AddControllers();
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
+builder.Services.Configure<SwaggerAppSettings>(builder.Configuration.GetSection("SwaggerAppSettings"));
+builder.Services.AddTransient<IConfigureOptions<SwaggerGenOptions>, ConfigureSwaggerOptions>();
 builder.Services.AddSwaggerGen();
+builder.Services.AddApiVersioningConfig();
 
 builder.Services.AddCors(options =>
 {
@@ -40,7 +43,18 @@ if (app.Environment.IsDevelopment())
 {
 	await DbInitializer.InitalizeAsync(app.Services);
 	app.UseSwagger();
-	app.UseSwaggerUI();
+	app.UseSwaggerUI(options =>
+	{
+		var provider = app.Services.GetRequiredService<IApiVersionDescriptionProvider>();
+
+		// Create a swagger endpoint for each version
+		foreach (var description in provider.ApiVersionDescriptions)
+		{
+			options.SwaggerEndpoint(
+					$"/swagger/{description.GroupName}/swagger.json",
+					$"Ecommerce API {description.GroupName.ToUpperInvariant()}");
+		}
+	});
 }
 
 app.UseHttpsRedirection();
