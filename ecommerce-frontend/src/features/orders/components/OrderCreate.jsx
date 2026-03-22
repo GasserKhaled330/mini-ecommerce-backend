@@ -2,9 +2,12 @@
 import { useProducts } from '../../products/api/productApi';
 import { useCreateOrder } from '../api/orderApi';
 import { Trash2, Plus, Minus, ShoppingCart } from 'lucide-react';
+import Pagination from '../../../components/Pagination';
 
 const OrderCreate = () => {
-	const { data: productData, isLoading } = useProducts(1, 100);
+	const [page, setPage] = useState(1);
+	const pageSize = 6;
+	const { data: productData, isLoading } = useProducts(page, pageSize);
 	const createOrderMutation = useCreateOrder();
 
 	const [customerName, setCustomerName] = useState('');
@@ -30,10 +33,6 @@ const OrderCreate = () => {
 		setSelectedItems((prev) => {
 			const existing = prev.find((i) => i.productId === product.id);
 			if (existing) return prev;
-			// if (existing) {
-			//     return prev.map(i => i.productId === product.id
-			//         ? { ...i, quantity: i.quantity + 1 } : i);
-			// }
 			return [
 				...prev,
 				{
@@ -122,6 +121,13 @@ const OrderCreate = () => {
 						);
 					})}
 				</div>
+				<Pagination
+					currentPage={productData.pageNumber}
+					totalPages={productData.totalPages}
+					hasNextPage={productData.hasNextPage}
+					hasPreviousPage={productData.hasPreviousPage}
+					onPageChange={(newPage) => setPage(newPage)}
+				/>
 			</div>
 
 			{/* Right: Order Summary */}

@@ -63,27 +63,6 @@ const ProductList = () => {
 				</button>
 			</div>
 
-			{/*<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {data?.items.map((product) => (
-                    <div key={product.id}
-                         className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-md transition-shadow">
-                        <div className="p-5">
-                            <h3 className="font-semibold text-lg text-gray-900">{product.name}</h3>
-                            <p className="text-gray-500 text-sm mt-1 line-clamp-2">{product.description}</p>
-
-                            <div className="mt-4 flex items-center justify-between">
-                                <span className="text-2xl font-bold text-indigo-600">${product.price}</span>
-                                <span className={`text-xs font-medium px-2 py-1 rounded ${
-                                    product.quantity > 0 ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'
-                                }`}>
-                  {product.quantity > 0 ? `${product.quantity} in stock` : 'Out of Stock'}
-                </span>
-                            </div>
-                        </div>
-                    </div>
-                ))}
-            </div>*/}
-
 			<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
 				{data?.items.map((product) => (
 					<div
